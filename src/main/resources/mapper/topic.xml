@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.encryptmsg.msgdog.mapper.TopicMapper">
+    <resultMap type="com.encryptmsg.msgdog.entity.Topic" id="TopicMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="cipherText" column="cipherText" jdbcType="LONGVARCHAR"/>
+        <result property="path" column="path" jdbcType="VARCHAR"/>
+        <result property="salt" column="salt" jdbcType="VARCHAR"/>
+        <result property="keyStoreText" column="keyStoreText" jdbcType="VARCHAR"/>
+        <result property="createTime" column="createTime" jdbcType="BIGINT"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="expire" column="expire" jdbcType="BIGINT"/>
+        <result property="secondPassword" column="secondPassword" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="queryTopicByPath" flushCache="true" useCache="false" parameterType="String" resultMap="TopicMap">
+        select
+        *
+        from topic where enable = 1 and path = #{path} limit 1
+    </select>
+
+    <select id="querySecondPasswordByPath" flushCache="true" useCache="false" parameterType="String" resultType="String">
+        select
+        secondPassword
+        from topic where enable = 1 and path = #{path} limit 1
+    </select>
+
+    <insert id="insertTopic" keyProperty="id" useGeneratedKeys="true">
+        insert into topic(cipherText,path,keyStoreText,createTime,enable,salt,expire,secondPassword,email)
+        values (#{cipherText},#{path},#{keyStoreText},#{createTime},#{enable},#{salt},#{expire},#{secondPassword},#{email})
+    </insert>
+
+    <delete id="deleteTopic" parameterType="Integer">
+        delete from topic where id=#{id}
+    </delete>
+
+    <delete id="deleteTopicByPath" parameterType="String">
+        delete from topic where path=#{path}
+    </delete>
+
+    <select id="queryTopicByTime" resultMap="TopicMap">
+        select * from topic where endTime &lt;= #{toTime} and endTime &gt;=#{fromTime} order by id desc;
+    </select>
+
+</mapper>
